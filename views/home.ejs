@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortener - LinkShort</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      padding: 40px;
+      width: 100%;
+      max-width: 600px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      color: #6b7280;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .tabs {
+      display: flex;
+      background: #f3f4f6;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 30px;
+    }
+
+    .header-actions {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .analytics-btn {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+    }
+
+    .analytics-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    }
+
+    .analytics-quick-access {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      border: 2px solid #8b5cf6;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+      animation: slideDown 0.3s ease;
+    }
+
+    .analytics-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .cancel-btn {
+      background: #6b7280;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 24px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .cancel-btn:hover {
+      background: #4b5563;
+    }
+
+    .analytics-link {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .analytics-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .short-url-result {
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      border: 2px solid #0ea5e9;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+      text-align: center;
+      animation: slideDown 0.5s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .short-url-result h3 {
+      color: #0ea5e9;
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+    }
+
+    .url-display {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .url-display a {
+      flex: 1;
+      color: #1f2937;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-align: left;
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .form-section {
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #fafafa;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .analytics-result {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border: 2px solid #f59e0b;
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 20px;
+      animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .analytics-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .analytics-header h3 {
+      color: #92400e;
+      font-size: 1.2rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #f59e0b;
+      display: block;
+    }
+
+    .stat-label {
+      color: #6b7280;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 24px;
+        margin: 10px;
+      }
+      
+      .logo {
+        font-size: 2rem;
+      }
+      
+      .tabs {
+        flex-direction: column;
+        gap: 2px;
+      }
+      
+      .url-display {
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      border: 2px solid #10b981;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #065f46;
+      font-weight: 600;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .error-message {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      border: 2px solid #ef4444;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #991b1b;
+      font-weight: 600;
+      animation: fadeIn 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="logo">LinkShort</h1>
+      <p class="tagline">Transform long URLs into short, shareable links</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="analytics-btn" onclick="toggleAnalyticsForm()">
+        <span class="icon">📊</span> View Analytics
+      </button>
+    </div>
+
+    <!-- Analytics Quick Access -->
+    <div id="analytics-form" class="analytics-quick-access" style="display: none;">
+      <h3 style="color: #667eea; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+        <span>📊</span> Quick Analytics Access
+      </h3>
+      <form onsubmit="return redirectToAnalytics(event)" class="analytics-form">
+        <div class="form-group">
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              class="form-input"
+              id="analyticsUrlId"
+              placeholder="Enter URL ID (e.g., abc123)"
+              required
+            >
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button type="submit" class="submit-btn" style="flex: 1;">
+            📈 View Full Analytics
+          </button>
+          <button type="button" class="cancel-btn" onclick="toggleAnalyticsForm()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Main Shortener Section -->
+    <div class="form-section">
+      <% if (locals.id) { %>
+        <div class="short-url-result">
+          <h3>✨ Your shortened URL is ready!</h3>
+          <div class="url-display">
+            <a href="http://localhost/3000/<%= id %>" target="_blank" id="shortLink">
+              http://localhost/3000/<%= id %>
+            </a>
+            <button class="copy-btn" onclick="copyLink()">
+              <span class="icon">📋</span> Copy
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px;">
+            <p style="color: #6b7280; font-size: 0.9rem;">
+              ID: <strong><%= id %></strong>
+            </p>
+            <a href="/url/analytics/<%= id %>" class="analytics-link">
+              📊 View Analytics
+            </a>
+          </div>
+        </div>
+      <% } %>
+
+      <form method="POST" action="/url">
+        <div class="form-group">
+          <label for="currentUrl">Enter your long URL</label>
+          <div class="input-wrapper">
+            <input 
+              name="currentUrl" 
+              type="url" 
+              class="form-input"
+              id="currentUrl"
+              placeholder="https://example.com/very-long-url-that-needs-shortening"
+              required
+            >
+          </div>
+        </div>
+        <button type="submit" class="submit-btn">
+          ✨ Generate Short URL
+        </button>
+      </form>
+    </div>
+
+
+
+    <div class="footer">
+      <p>Fast • Secure • Analytics-Enabled</p>
+    </div>
+  </div>
+
+  <script>
+    function toggleAnalyticsForm() {
+      const form = document.getElementById('analytics-form');
+      const isVisible = form.style.display !== 'none';
+      
+      if (isVisible) {
+        form.style.display = 'none';
+      } else {
+        form.style.display = 'block';
+        // Focus on input after a short delay for animation
+        setTimeout(() => {
+          document.getElementById('analyticsUrlId').focus();
+        }, 100);
+      }
+    }
+
+    function redirectToAnalytics(event) {
+      event.preventDefault();
+      const urlId = document.getElementById('analyticsUrlId').value.trim();
+      
+      if (urlId) {
+        // Redirect to the analytics page with the ID
+        window.location.href = `/url/analytics/${encodeURIComponent(urlId)}`;
+      }
+      
+      return false;
+    }
+
+    function copyLink() {
+      const link = document.querySelector("#shortLink").href;
+      navigator.clipboard.writeText(link).then(() => {
+        // Create and show success message
+        const btn = event.target.closest('.copy-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="icon">✅</span> Copied!';
+        btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        }, 2000);
+      }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = link;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Copied to clipboard: ' + link);
+      });
+    }
+
+    // Auto-focus on URL input when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlInput = document.getElementById('currentUrl');
+      if (urlInput && !document.querySelector('.short-url-result')) {
+        urlInput.focus();
+      }
+    });
+
+    // Add loading state to form submissions
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', function() {
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ Processing...';
+        btn.disabled = true;
+        
+        // Re-enable after 5 seconds as fallback
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }, 5000);
+      });
+    });
+
+
+  </script>
+</body>
+</html>

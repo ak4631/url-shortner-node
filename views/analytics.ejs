@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard - LinkShort</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+      min-height: 100vh;
+      color: #f8fafc;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(-2px);
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #60a5fa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .url-info-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 40px;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .url-header {
+      display: flex;
+      align-items: center;
+      justify-content: between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .url-id-badge {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .url-links {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .url-item {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .url-label {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .url-value {
+      color: #f8fafc;
+      font-size: 1.1rem;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .url-value a {
+      color: #60a5fa;
+      text-decoration: none;
+      flex: 1;
+      transition: color 0.3s ease;
+    }
+
+    .url-value a:hover {
+      color: #93c5fd;
+    }
+
+    .copy-btn-small {
+      background: rgba(16, 185, 129, 0.8);
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .copy-btn-small:hover {
+      background: rgba(16, 185, 129, 1);
+      transform: scale(1.05);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      text-align: center;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.6s ease;
+      animation-delay: 0.2s;
+      animation-fill-mode: both;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #60a5fa;
+      display: block;
+      margin-bottom: 8px;
+      text-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+    }
+
+    .stat-label {
+      color: #cbd5e1;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-description {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .activity-section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 40px;
+      animation: fadeInUp 0.6s ease;
+      animation-delay: 0.4s;
+      animation-fill-mode: both;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .activity-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .activity-item {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      border-radius: 16px;
+      border-left: 4px solid #34d399;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .activity-item:hover {
+      background: rgba(0, 0, 0, 0.3);
+      transform: translateX(4px);
+    }
+
+    .activity-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .activity-icon {
+      background: linear-gradient(135deg, #34d399, #10b981);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .activity-text {
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    .activity-time {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .insights-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .insight-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      animation: fadeInUp 0.6s ease;
+      animation-delay: 0.6s;
+      animation-fill-mode: both;
+    }
+
+    .insight-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .insight-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .insight-content {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .refresh-btn {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    }
+
+    .no-data-message {
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+    }
+
+    .no-data-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 10px;
+      }
+      
+      .page-title {
+        font-size: 2rem;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .url-value {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <a href="/" class="back-btn">
+          <span>←</span> Back to Home
+        </a>
+        <h1 class="page-title">Analytics Dashboard</h1>
+      </div>
+      <button class="refresh-btn" onclick="refreshData()">
+        <span>🔄</span> Refresh Data
+      </button>
+    </div>
+
+    <% if (locals.analytics && locals.analytics.id) { %>
+      <!-- URL Info Card -->
+      <div class="url-info-card">
+        <div class="url-header">
+          <div class="url-id-badge">
+            <span>🔗</span> ID: <%= analytics.id %>
+          </div>
+        </div>
+        
+        <div class="url-links">
+          <div class="url-item">
+            <div class="url-label">Short URL</div>
+            <div class="url-value">
+              <a href="http://localhost:3000/<%= analytics.id %>" target="_blank">
+                http://localhost:3000/<%= analytics.id %>
+              </a>
+              <button class="copy-btn-small" onclick="copyToClipboard('http://localhost:3000/<%= analytics.id %>')">
+                Copy
+              </button>
+            </div>
+          </div>
+          
+          <% if (analytics.originalUrl) { %>
+          <div class="url-item">
+            <div class="url-label">Original URL</div>
+            <div class="url-value">
+              <a href="<%= analytics.originalUrl %>" target="_blank">
+                <%= analytics.originalUrl %>
+              </a>
+              <button class="copy-btn-small" onclick="copyToClipboard('<%= analytics.originalUrl %>')">
+                Copy
+              </button>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-icon">👁️</span>
+          <span class="stat-number"><%= analytics.views || 0 %></span>
+          <div class="stat-label">Total Views</div>
+          <div class="stat-description">
+            Number of times this link has been clicked
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <span class="stat-icon">📅</span>
+          <span class="stat-number">
+            <%= analytics.createdAt ? new Date(analytics.createdAt).toLocaleDateString() : 'N/A' %>
+          </span>
+          <div class="stat-label">Created</div>
+          <div class="stat-description">
+            When this short URL was first generated
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <span class="stat-icon">⚡</span>
+          <span class="stat-number">
+            <%= analytics.views ? Math.round((analytics.views / Math.max(1, Math.ceil((new Date() - new Date(analytics.createdAt || new Date())) / (1000 * 60 * 60 * 24)))) * 100) / 100 : 0 %>
+          </span>
+          <div class="stat-label">Avg Daily Views</div>
+          <div class="stat-description">
+            Average clicks per day since creation
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="activity-section">
+        <h2 class="section-title">
+          <span>📈</span> Recent Activity
+        </h2>
+        
+        <div class="activity-timeline">
+          <% if (analytics.views > 0) { %>
+            <div class="activity-item">
+              <div class="activity-info">
+                <div class="activity-icon">👁️</div>
+                <div class="activity-text">
+                  Link has been viewed <%= analytics.views %> time<%= analytics.views !== 1 ? 's' : '' %>
+                </div>
+              </div>
+              <div class="activity-time">
+                Total clicks recorded
+              </div>
+            </div>
+          <% } %>
+          
+          <div class="activity-item">
+            <div class="activity-info">
+              <div class="activity-icon">🔗</div>
+              <div class="activity-text">
+                Short URL created successfully
+              </div>
+            </div>
+            <div class="activity-time">
+              <%= analytics.createdAt ? new Date(analytics.createdAt).toLocaleDateString() : 'Date unknown' %>
+            </div>
+          </div>
+          
+          <% if (analytics.views === 0) { %>
+          <div class="activity-item">
+            <div class="activity-info">
+              <div class="activity-icon">⏳</div>
+              <div class="activity-text">
+                Waiting for first click...
+              </div>
+            </div>
+            <div class="activity-time">
+              Share your link to start tracking
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Insights -->
+      <div class="insights-section">
+        <div class="insight-card">
+          <div class="insight-header">
+            <span>💡</span>
+            <h3 class="insight-title">Performance Insights</h3>
+          </div>
+          <div class="insight-content">
+            <% if (analytics.views === 0) { %>
+              Your link hasn't been clicked yet. Share it on social media, email, or messaging apps to start getting traffic!
+            <% } else if (analytics.views < 10) { %>
+              Great start! Your link is getting some initial traction. Consider sharing it in more channels to increase visibility.
+            <% } else if (analytics.views < 100) { %>
+              Nice momentum! Your link is performing well. This level of engagement shows people find your content valuable.
+            <% } else { %>
+              Excellent performance! Your link is very popular. Consider creating more similar content to capitalize on this success.
+            <% } %>
+          </div>
+        </div>
+        
+        <div class="insight-card">
+          <div class="insight-header">
+            <span>🎯</span>
+            <h3 class="insight-title">Recommendations</h3>
+          </div>
+          <div class="insight-content">
+            <% if (analytics.views === 0) { %>
+              • Share your link on social media platforms<br>
+              • Include it in email signatures<br>
+              • Add it to your website or blog<br>
+              • Share in relevant online communities
+            <% } else { %>
+              • Track which sharing methods work best<br>
+              • Consider the best times to share<br>
+              • Monitor click patterns for optimization<br>
+              • Create similar high-performing content
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+    <% } else { %>
+      <!-- No Data State -->
+      <div class="url-info-card">
+        <div class="no-data-message">
+          <div class="no-data-icon">🔍</div>
+          <h2 style="color: #cbd5e1; margin-bottom: 16px;">No Analytics Data Found</h2>
+          <p>The URL ID you're looking for doesn't exist or hasn't been accessed yet.</p>
+          <p style="margin-top: 12px;">
+            <a href="/" style="color: #60a5fa; text-decoration: none;">← Go back to create a new short URL</a>
+          </p>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <script>
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        // Visual feedback
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.background = 'rgba(16, 185, 129, 1)';
+        
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = 'rgba(16, 185, 129, 0.8)';
+        }, 2000);
+      }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Copied to clipboard: ' + text);
+      });
+    }
+
+    function refreshData() {
+      const btn = document.querySelector('.refresh-btn');
+      const originalHTML = btn.innerHTML;
+      
+      btn.innerHTML = '<span class="pulse-animation">🔄</span> Refreshing...';
+      btn.disabled = true;
+      
+      // Reload the page after a short delay for better UX
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
+
+    // Add some interactive animations
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add hover effects to stat cards
+      const statCards = document.querySelectorAll('.stat-card');
+      statCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+      });
+
+      // Add typing effect to stat numbers
+      const statNumbers = document.querySelectorAll('.stat-number');
+      statNumbers.forEach(numberEl => {
+        const finalNumber = numberEl.textContent;
+        if (!isNaN(finalNumber) && finalNumber !== '') {
+          let currentNumber = 0;
+          const increment = Math.ceil(finalNumber / 30);
+          const timer = setInterval(() => {
+            currentNumber += increment;
+            if (currentNumber >= finalNumber) {
+              currentNumber = finalNumber;
+              clearInterval(timer);
+            }
+            numberEl.textContent = currentNumber;
+          }, 50);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
